@@ -1,0 +1,9 @@
+CC=gcc
+CFLAGS=
+LDFLAGS=
+SOURCES=main.c
+EXECUTABLE=mincg
+all:
+	$(CC) $(CFLAGS) $(SOURCES) $(LDFLAGS) -o $(EXECUTABLE)
+clean:
+	rm -rf $(EXECUTABLE)
