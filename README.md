@@ -3,7 +3,7 @@ Min. firmware version manager for Playstation Vita/TV
 
 ## Description
 This toolset lets you manage PS Vita/TV's SMI data which stores the minfw ("factory firmware") version.
-<br>	- How does it work? - Check out Moth Exploit by TeamMolecule/xyz: https://wiki.henkaku.xyz/vita/Vulnerabilities#moth_exploit </br>
+<br>How does it work? - Check out Moth Exploit by TeamMolecule/xyz: https://wiki.henkaku.xyz/vita/Vulnerabilities#moth_exploit </br>
 
 ### PC tool
 This tool lets you find a compatible signed SMI block for your console.
