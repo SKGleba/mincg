@@ -1,8 +1,7 @@
 /*
-    mincg by SKGleba
+    mincg_public by SKGleba
     All Rights Reserved
 */
-
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -57,7 +56,7 @@ int main(int argc, char **argv){
 			fp = fopen(gbuff, "rb");
 			if (fp == NULL) {
 				cur = cur - 1;
-				printf("\nEND: no min fw lower than 03.6500.01\n");
+				printf("\nEND: no min fw lower than 03.6500.01 and higher than 00.9960.00\n");
 				break;
 			}
 		}
@@ -74,7 +73,7 @@ int main(int argc, char **argv){
 		fclose(fp);
 		unlink("tmp.dec2");
 		printf("0x%08X\n", *(uint32_t *)fw);
-		if (*(uint32_t *)fw < 0x03650001) {
+		if (*(uint32_t *)fw < 0x03650001 && *(uint32_t *)fw > 0x00996000) {
 			printf("\nEND: min fw resulting from data/%s_SMI_NOUTER.SMI_e1 (%s) is lower than 03.6500.01 ( %02X.%02X%02X.%02X )\n", cname, gbuff, fw[3], fw[2], fw[1], fw[0]);
 			found = 1;
 			break;

@@ -1,6 +1,6 @@
 /*
-	mincg by SKGleba
-	All Rights Reserved
+    mincg by SKGleba
+    All Rights Reserved
 */
 
 #include "types.h"
@@ -128,7 +128,7 @@ void __attribute__((optimize("O0"))) _start(void) {
 		while (BIGMAC[9] & 1) {}
 	}
 	
-	if (*(u32_t *)0x1C000500 < fw) {
+	if (*(u32_t *)0x1C000500 > 0x00996000 && *(u32_t *)0x1C000500 < fw) {
 		RESULTS[11] = 0x69;
 	} else 
 		RESULTS[11] = 0x34;
