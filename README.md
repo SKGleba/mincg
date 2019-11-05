@@ -31,7 +31,7 @@ This tool lets you Flash/Dump the SMI data including per-console SMI decryption 
 	- You do it at your own risk, i take no responsability for whatever happens to your console.
 	- The PC tool requires OpenSSL (enc).
 	- mincg creates a log in "ux0:data/mincg.log".
-	- You should NOT downgrade below 3.60 if your min fw was higher than it, there may be some hardware differences on lower firmwares.
+	- You should NOT downgrade below 3.60 there may be some hardware differences on lower firmwares i.e: no slims support on 2.00.
 	- You should NOT update to 3.74+ when it gets released, sony may patch this exploit.
 	
 ## Credits
