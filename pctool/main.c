@@ -14,9 +14,10 @@ int main(int argc, char **argv){
 	const char *iv_1 = "2F0AEEF98EE3965650F8485E6C0BC2C4";
 	const char *iv_2 = "69D7618B7DBE7B59C04DEF5169831FBF";
 	
-	unsigned char syscmdc[512], cbuff[128], fw[4], gbuff[128], dbuff[128], KEY_1[65], KEY_2[65], K1BUF[32], K2BUF[32], cname[9], UNKKBUF[64];
+	unsigned char syscmdc[512], cbuff[128], fw[4], gbuff[128], dbuff[128], KEY_1[65], KEY_2[65], K1BUF[32], K2BUF[32], cname[9], UNKKBUF[64], kinpbuf[2];
 	
-	int opmode = 1, l = 0, cur = 0, found = 0;
+	int opmode = 1, l = 0, cur = 0, found = 0, maxf = 0;
+	uint32_t fmsn[9], fmsf[9];
 	FILE *fp, *ft;
 	if(argc < 2) {
 		printf("\nusage: mincg [KEYFILE]\n");
@@ -40,7 +41,7 @@ int main(int argc, char **argv){
 	sprintf(KEY_1, "%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X", K1BUF[0], K1BUF[1], K1BUF[2], K1BUF[3], K1BUF[4], K1BUF[5], K1BUF[6], K1BUF[7], K1BUF[8], K1BUF[9], K1BUF[10], K1BUF[11], K1BUF[12], K1BUF[13], K1BUF[14], K1BUF[15], K1BUF[16], K1BUF[17], K1BUF[18], K1BUF[19], K1BUF[20], K1BUF[21], K1BUF[22], K1BUF[23], K1BUF[24], K1BUF[25], K1BUF[26], K1BUF[27], K1BUF[28], K1BUF[29], K1BUF[30], K1BUF[31]);
 	sprintf(KEY_2, "%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X", K2BUF[0], K2BUF[1], K2BUF[2], K2BUF[3], K2BUF[4], K2BUF[5], K2BUF[6], K2BUF[7], K2BUF[8], K2BUF[9], K2BUF[10], K2BUF[11], K2BUF[12], K2BUF[13], K2BUF[14], K2BUF[15], K2BUF[16], K2BUF[17], K2BUF[18], K2BUF[19], K2BUF[20], K2BUF[21], K2BUF[22], K2BUF[23], K2BUF[24], K2BUF[25], K2BUF[26], K2BUF[27], K2BUF[28], K2BUF[29], K2BUF[30], K2BUF[31]);
 	
-	printf("starting loop\n");
+	printf("please wait, searching...\n");
 	while (1) {
 		memset((void *)syscmdc, 0, 512);
 		memset((void *)cbuff, 0, 128);
@@ -56,7 +57,8 @@ int main(int argc, char **argv){
 			fp = fopen(gbuff, "rb");
 			if (fp == NULL) {
 				cur = cur - 1;
-				printf("\nEND: no min fw lower than 03.6500.01 and higher than 00.9960.00\n");
+				if (found == 0)
+					printf("\nEND: no min fw lower than 03.6500.01 and higher than 00.9960.00\n");
 				break;
 			}
 		}
@@ -64,29 +66,57 @@ int main(int argc, char **argv){
 		fclose(fp);
 		sprintf(cname, "%02X%02X%02X%02X", UNKKBUF[0], UNKKBUF[1], UNKKBUF[32], UNKKBUF[33]);
 		sprintf(syscmdc, "openssl enc -d -aes-256-cbc -nopad -in data/%s_SMI_NOUTER.SMI_e1 -out tmp.dec2 -K %s -iv %s", cname, KEY_1, iv_2);
-		printf("\nAES256-CBC DECRYPT INNER LAYER:\n in: data/%s_SMI_NOUTER.SMI_e1\n key: %s\n iv: %s\n...", cname, KEY_1, iv_2);
 		system(syscmdc);
-		printf("ok!\n");
-		printf("Checking resulting min fw ver... ");
 		fp = fopen("tmp.dec2", "rb");
 		fread(fw, 1, 4, fp);
 		fclose(fp);
 		unlink("tmp.dec2");
-		printf("0x%08X\n", *(uint32_t *)fw);
 		if (*(uint32_t *)fw < 0x03650001 && *(uint32_t *)fw > 0x00996000) {
-			printf("\nEND: min fw resulting from data/%s_SMI_NOUTER.SMI_e1 (%s) is lower than 03.6500.01 ( %02X.%02X%02X.%02X )\n", cname, gbuff, fw[3], fw[2], fw[1], fw[0]);
-			found = 1;
-			break;
+			printf("\nmin fw resulting from data/%s_SMI_NOUTER.SMI_e1 (%s) is lower than 03.6500.01 ( %02X.%02X%02X.%02X )\n", cname, gbuff, fw[3], fw[2], fw[1], fw[0]);
+			fmsn[found] = cur;
+			fmsf[found] = *(uint32_t *)fw;
+			if (found < 9)
+				found = found + 1;
 		}
 		cur = cur + 1;
 	}
-	printf("\nloop end\n");
+	
+	printf("\nsearch end\n");
 	if (found == 0)
 		return 0;
+	
+	maxf = found - 1;
+	
+	printf("\nresults:\n");
+	while (found > 0) {
+		found = found - 1;
+		printf("%d: 0x%X\n", found, fmsf[found]);
+	}
+	
+	printf("\nchoose your minfw: ");
+	scanf(" %c", &kinpbuf);
+	getchar();
+	
+	if ((kinpbuf[0] - 0x30) > maxf) {
+		printf("u wot m8? (%d > %d)\n", (kinpbuf[0] - 0x30), maxf);
+		return -1;
+	}
+	
+	sprintf(gbuff, "keys/%d.SMI_KEY", fmsn[(kinpbuf[0] - 0x30)]);
+	fp = fopen(gbuff, "rb");
+	if (fp == NULL) {
+		printf("\nfile read err (%s)\n", gbuff);
+		return -1;
+	}
+	fread(UNKKBUF, 64, 1, fp);
+	fclose(fp);
+	
+	sprintf(cname, "%02X%02X%02X%02X", UNKKBUF[0], UNKKBUF[1], UNKKBUF[32], UNKKBUF[33]);
 	sprintf(syscmdc, "openssl enc -aes-256-cbc -nopad -in data/%s_SMI_NOUTER.SMI_e1 -out TSMI.rSMI -K %s -iv %s", cname, KEY_2, iv_1);
 	printf("\nAES256-CBC ENCRYPT OUTER LAYER:\n in: data/%s_SMI_NOUTER.SMI_e1\n out: TSMI.rSMI\n key: %s\n iv: %s\n...", cname, KEY_2, iv_1);
 	system(syscmdc);
 	printf("ok!\n");
+	
 	printf("\npacking SMI data to TSMI.SMI... \n");
 	sprintf(dbuff, "data/%s_SMI_HEADER.SMI_HDR", cname);
 	ft = fopen(dbuff, "rb");
@@ -111,5 +141,6 @@ int main(int argc, char **argv){
 	fwrite(syscmdc, 0x200, 1, fp);
 	fclose(fp);
 	printf("done: TSMI.SMI\n");
+	
 	return 1;
 }
