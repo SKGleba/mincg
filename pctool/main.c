@@ -71,7 +71,7 @@ int main(int argc, char **argv){
 		fread(fw, 1, 4, fp);
 		fclose(fp);
 		unlink("tmp.dec2");
-		if (*(uint32_t *)fw < 0x03650001 && *(uint32_t *)fw > 0x00996000) {
+		if (*(uint32_t *)fw < 0x03650001 && *(uint32_t *)fw >= 0x00996000) {
 			printf("\nmin fw resulting from data/%s_SMI_NOUTER.SMI_e1 (%s) is lower than 03.6500.01 ( %02X.%02X%02X.%02X )\n", cname, gbuff, fw[3], fw[2], fw[1], fw[0]);
 			fmsn[found] = cur;
 			fmsf[found] = *(uint32_t *)fw;
